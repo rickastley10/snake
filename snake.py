@@ -1,5 +1,6 @@
 import turtle as t
 import random
+t.hideturtle()
 facing = "up"
 t.penup()
 px, py = 0, 0
@@ -9,6 +10,7 @@ bx = (random.randint(-10, 10))*20
 by = (random.randint(-10, 10))*20
 segc = 4
 t.tracer(0, 0)
+
 for _ in range(segc):
     segments.append({
         "sx": 0,
