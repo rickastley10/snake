@@ -9,6 +9,8 @@ t.title("snake")
 bx = (random.randint(-10, 10))*20
 by = (random.randint(-10, 10))*20
 segc = 4
+score = 0
+highscore = 0
 t.tracer(0, 0)
 
 for _ in range(segc):
@@ -41,7 +43,7 @@ def snake():
 def snakemove():
     global px, py
     global bx, by
-    global segc, segments
+    global segc, segments, score
     if facing == "up":
         segments.insert(0, {"sx": px, "sy": py})
         
@@ -66,6 +68,7 @@ def snakemove():
         
         bx = (random.randint(-10, 10))*20
         by = (random.randint(-10, 10))*20
+        score += 1
     else:
         segments.pop()
 
@@ -82,6 +85,7 @@ def snakemove():
 
         px = 0
         py = 0
+        score = 0
     
 
 def berry():
@@ -95,6 +99,12 @@ def berry():
     t.end_fill()
     t.penup()
     
+def display():
+    global highscore
+    if score > highscore:
+        highscore = score
+    t.goto(-200, -200)
+    t.write(f"score: {score}\n highscore: {highscore}", font=("Arial", 8, "normal"))
 
 def right():
     global facing
@@ -126,7 +136,14 @@ t.onkey(up, "Up")
 t.onkey(down, "Down")
 t.onkey(left, "Left")
 t.onkey(right, "Right")
+
+t.onkey(up, "w")
+t.onkey(down, "s")
+t.onkey(left, "a")
+t.onkey(right, "d")
+
 t.onscreenclick(click)
+
 t.listen()
 
 def mainloop():
@@ -135,6 +152,7 @@ def mainloop():
     snake()
     berry()
     snakemove()
+    display()
 
     t.ontimer(mainloop, 300)
 
