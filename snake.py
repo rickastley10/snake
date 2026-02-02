@@ -161,9 +161,11 @@ t.listen()
 
 def mainloop():
     t.clear()
+    
+    snakemove()
     snake()
     berry()
-    snakemove()
-    t.ontimer(mainloop, 300)
+    
+    t.ontimer(mainloop, 100)
 
 t.mainloop()
