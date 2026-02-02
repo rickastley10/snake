@@ -113,20 +113,38 @@ def go_down():
     global facing
     facing = "down"
 
+def touchleft():
+    global facing
+    if facing == "right":
+        facing = "up"
+    elif facing == "up":
+        facing = "left"
+    elif facing == "left":
+        facing = "down"
+    elif facing == "down":
+        facing = "right"
+
+def touchright():
+    global facing
+    if facing == "right":
+        facing = "down"
+    elif facing == "down":
+        facing = "left"
+    elif facing == "left":
+        facing = "up"
+    elif facing == "up":
+        facing = "right"
+
 def click(x, y):
     global menu
     if menu == 1:
         menu = 0
         menu1()
     if menu == 0:
-        if y < 0 and 100 > x > -100:
-            go_down()
-        if y > 0 and 100 > x > -100:
-            go_up()
-        if x < 0 and 100 > y > -100:
-            go_left()
-        if x > 0 and 100 > y > -100:
-            go_right()
+        if x < 0:
+            touchleft()
+        elif 0 < x:
+            touchright()
 
 t.onkey(go_up, "Up")
 t.onkey(go_down, "Down")
@@ -136,6 +154,8 @@ t.onkey(go_up, "w")
 t.onkey(go_down, "s")
 t.onkey(go_left, "a")
 t.onkey(go_right, "d")
+t.onkey(touchleft, "q")
+t.onkey(touchright, "e")
 t.onscreenclick(click)
 t.listen()
 
