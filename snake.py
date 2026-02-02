@@ -132,78 +132,10 @@ t.onkey(go_up, "Up")
 t.onkey(go_down, "Down")
 t.onkey(go_left, "Left")
 t.onkey(go_right, "Right")
-t.onscreenclick(click)
-t.listen()
-
-def mainloop():
-    t.clear()
-    snake()
-    berry()
-    snakemove()
-    t.ontimer(mainloop, 300)
-
-t.mainloop()        by = (random.randint(-10, 10)) * 20
-    else:
-        segments.pop()
-
-    if any(px == seg["sx"] and py == seg["sy"] for seg in segments):
-        segc = 4
-        segments.clear()
-        segments = []
-        for _ in range(segc):
-            segments.append({
-                "sx": 0,
-                "sy": 0
-            })
-        px = 0
-        py = 0
-
-def berry():
-    t.goto(bx, by)
-    t.pendown()
-    t.fillcolor("red")
-    t.begin_fill()
-    for _ in range(4):
-        t.forward(20)
-        t.right(90)
-    t.end_fill()
-    t.penup()
-
-def go_right():
-    global facing
-    facing = "right"
-
-def go_left():
-    global facing
-    facing = "left"
-
-def go_up():
-    global facing
-    facing = "up"
-
-def go_down():
-    global facing
-    facing = "down"
-
-def click(x, y):
-    global menu
-    if menu == 1:
-        menu = 0
-        menu1()
-    if menu == 0:
-        if y < 0 and 100 > x > -100:
-            go_down()
-        if y > 0 and 100 > x > -100:
-            go_up()
-        if x < 0 and 100 > y > -100:
-            go_left()
-        if x > 0 and 100 > y > -100:
-            go_right()
-
-t.onkey(go_up, "Up")
-t.onkey(go_down, "Down")
-t.onkey(go_left, "Left")
-t.onkey(go_right, "Right")
+t.onkey(go_up, "w")
+t.onkey(go_down, "s")
+t.onkey(go_left, "a")
+t.onkey(go_right, "d")
 t.onscreenclick(click)
 t.listen()
 
@@ -215,4 +147,3 @@ def mainloop():
     t.ontimer(mainloop, 300)
 
 t.mainloop()
-
