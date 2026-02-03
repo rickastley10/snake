@@ -10,7 +10,9 @@ bx = (random.randint(-10, 10)) * 20
 by = (random.randint(-10, 10)) * 20
 segc = 4
 t.tracer(0, 0)
-
+score = 0
+highscore =0
+t.bgcolor("black")
 
 for _ in range(segc):
     segments.append({
@@ -26,12 +28,13 @@ def menu1():
         t.pencolor("red")
         t.write("snake game\n        click anywhere to start", font=("Arial", 16, "normal"))
     if menu == 0:
-        mainloop()
+        pass
 
 menu1()
 
 def snake():
-    t.fillcolor("black")
+    t.fillcolor("dark green")
+    t.pencolor("black")
     t.goto(px, py)
     t.pendown()
     t.begin_fill()
@@ -40,6 +43,7 @@ def snake():
         t.right(90)
     t.end_fill()
     t.penup()
+    t.fillcolor("green")
     for seg in segments:
         t.goto(seg["sx"], seg["sy"])
         t.pendown()
@@ -50,10 +54,11 @@ def snake():
         t.end_fill()
         t.penup()
 
+
 def snakemove():
     global px, py
     global bx, by
-    global segc, segments
+    global segc, segments, score, highscore
 
     if facing == "up":
         segments.insert(0, {"sx": px, "sy": py})
@@ -70,6 +75,7 @@ def snakemove():
 
     if px == bx and py == by:
         bx = (random.randint(-10, 10)) * 20
+        score += 1
         by = (random.randint(-10, 10)) * 20
     else:
         segments.pop()
@@ -85,6 +91,7 @@ def snakemove():
             })
         px = 0
         py = 0
+        score = 0
 
 def berry():
     t.goto(bx, by)
@@ -97,21 +104,46 @@ def berry():
     t.end_fill()
     t.penup()
 
+def gui():
+    global score, highscore
+    if score > highscore:
+        highscore = score
+    t.goto(200, 200)
+    t.pencolor("orange")
+    t.write(f"score: {score}\nhighscore: {highscore}")
+
+    t.goto(300, 300)
+    t.pendown()
+    t.pencolor("red")
+    t.goto(300, -300)
+    t.goto(-300, -300)
+    t.goto(-300, 300)
+    t.goto(300, 300)
+    t.penup()
+
+    
+
+
+
 def go_right():
     global facing
-    facing = "right"
+    if facing != "left":
+        facing = "right"
 
 def go_left():
     global facing
-    facing = "left"
+    if facing != "right":
+        facing = "left"
 
 def go_up():
     global facing
-    facing = "up"
+    if facing != "down":
+        facing = "up"
 
 def go_down():
     global facing
-    facing = "down"
+    if facing != "up":
+        facing = "down"
 
 def touchleft():
     global facing
@@ -139,7 +171,7 @@ def click(x, y):
     global menu
     if menu == 1:
         menu = 0
-        menu1()
+        mainloop()
     if menu == 0:
         if x < 0:
             touchleft()
@@ -165,6 +197,7 @@ def mainloop():
     snakemove()
     snake()
     berry()
+    gui()
     
     t.ontimer(mainloop, 100)
 
