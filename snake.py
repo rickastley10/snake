@@ -1,148 +1,256 @@
-#include <windows.h>
-#include <stdlib.h>
-#include <time.h>
+import turtle as t
+import random
+t.hideturtle()
+facing = "up"
+t.penup()
+px, py = 0, 0
+segments = []
+t.title("snake")
+bx = (random.randint(-10, 10)) * 20
+by = (random.randint(-10, 10)) * 20
+segc = 4
+startsegcount = 4
+t.tracer(0, 0)
+score = 0
+highscore =0
+t.bgcolor("black")
+clr = 100
+clrm = 1
+calccolour = 0
+berrycolour = 200
+berrycolourm = 1
 
-#define CELL_SIZE 20
-#define WIDTH 30
-#define HEIGHT 20
-#define MAX_SEG 10
+for _ in range(segc):
+    segments.append({
+        "sx": 0,
+        "sy": 0
+    })
 
-HWND hwnd;
+menu = 1
 
-/* snake state */
-int segcount = 4;
-int hx = 5, hy = 5;
-int oldhx, oldhy;
-int dirx = 1, diry = 0;
+def menu1():
+    if menu == 1:
+        t.goto(-100, 0)
+        t.pencolor("red")
+        t.write("snake game\n        click anywhere / press space to start", font=("Arial", 16, "normal"))
+    if menu == 0:
+        pass
 
-/* segments */
-int sgx[MAX_SEG], sgy[MAX_SEG];
+menu1()
 
-/* food */
-int bx, by;
+def snake():
+    global calccolour
+    t.fillcolor(0, 1, 0)
+    t.pencolor("black")
+    t.goto(px, py)
+    t.pendown()
+    t.begin_fill()
+    for _ in range(4):
+        t.forward(20)
+        t.right(90)
+    t.end_fill()
+    t.penup()
+    t.fillcolor("green")
+    calccolour = 0
+    for seg in segments:
+        if calccolour == 100:
+            calccolour = 0
+        calccolour += 5
+        if calccolour == 100:
+            calccolour = 0
+        t.fillcolor(0, ((100-calccolour)/255), 0)
+        t.goto(seg["sx"], seg["sy"])
+        t.pendown()
+        t.begin_fill()
+        for _ in range(4):
+            t.forward(20)
+            t.right(90)
+        t.end_fill()
+        t.penup()
 
-/* --------- drawing ---------- */
 
-void draw_cell(int x, int y, COLORREF c) {
-    HDC hdc = GetDC(hwnd);
-    HBRUSH b = CreateSolidBrush(c);
-    RECT r = { x*CELL_SIZE, y*CELL_SIZE,
-               (x+1)*CELL_SIZE, (y+1)*CELL_SIZE };
-    FillRect(hdc, &r, b);
-    DeleteObject(b);
-    ReleaseDC(hwnd, hdc);
-}
+def snakemove():
+    global px, py
+    global bx, by
+    global segc, segments, score, highscore
 
-void clear_screen(void) {
-    HDC hdc = GetDC(hwnd);
-    RECT r;
-    GetClientRect(hwnd, &r);
-    FillRect(hdc, &r, (HBRUSH)(COLOR_WINDOW+1));
-    ReleaseDC(hwnd, hdc);
-}
+    if facing == "up":
+        segments.insert(0, {"sx": px, "sy": py})
+        py += 20
+    elif facing == "down":
+        segments.insert(0, {"sx": px, "sy": py})
+        py -= 20
+    elif facing == "left":
+        segments.insert(0, {"sx": px, "sy": py})
+        px -= 20
+    elif facing == "right":
+        segments.insert(0, {"sx": px, "sy": py})
+        px += 20
 
-/* --------- game logic ---------- */
+    if px == bx and py == by:
+        bx = (random.randint(-10, 10)) * 20
+        score += 1
+        by = (random.randint(-10, 10)) * 20
+    else:
+        segments.pop()
 
-void spawn_food(void) {
-    bx = rand() % WIDTH;
-    by = rand() % HEIGHT;
-}
+    if any(px == seg["sx"] and py == seg["sy"] for seg in segments):
+        gameover()
+    if (px >= 300) or (px <= -300) or (py >= 300) or (py <= -300):
+        gameover()
+def gameover():
+    global px, py, score, segc, segments, startsegcount
+    score = 0
+    px = 0
+    py = 0
+    segc = startsegcount
+    segments.clear()
+    segments = []
+    for _ in range(segc):
+        segments.append({
+            "sx": 0,
+            "sy": 0
+        })
+def berry():
+    global berrycolour, berrycolourm
+    if berrycolourm == 1:
+        berrycolour += 10
+        if berrycolour >= 200:
+            berrycolour = 200
+            berrycolourm = 2
+    if berrycolourm == 2:
+        berrycolour -= 10
+        if berrycolour <= 100:
+            berrycolour = 100
+            berrycolourm = 1
+    t.goto(bx, by)
+    t.pendown()
+    t.fillcolor(berrycolour/255, 0, 0)
+    t.begin_fill()
+    for _ in range(4):
+        t.forward(20)
+        t.right(90)
+    t.end_fill()
+    t.penup()
 
-void move_snake(void) {
-    int i;
+def gui():
+    global score, highscore, clr, clrm
+    if score > highscore:
+        highscore = score
 
-    /* shift tail */
-    for (i = segcount - 1; i > 0; i--) {
-        sgx[i] = sgx[i - 1];
-        sgy[i] = sgy[i - 1];
-    }
 
-    /* first segment gets old head */
-    if (segcount > 0) {
-        sgx[0] = oldhx;
-        sgy[0] = oldhy;
-    }
-}
+    if clrm == 1:
+        clr += 1
+        if clr >= 200:
+            clr = 200
+            clrm = 2
 
-void draw_snake(void) {
-    int i;
-    draw_cell(hx, hy, RGB(0, 255, 0));   /* head */
+    elif clrm == 2:
+        clr -= 1
+        if clr <= 0:
+            clr = 0
+            clrm = 1
 
-    for (i = 0; i < segcount; i++) {
-        draw_cell(sgx[i], sgy[i], RGB(0, 180, 0));
-    }
-}
+    t.goto(200, 200)
+    t.pencolor(0, (200/255), (200/255))
+    t.write(f"score: {score}\nhighscore: {highscore}")
 
-void update(void) {
-    oldhx = hx;
-    oldhy = hy;
+    t.goto(300, 300)
+    t.pendown()
 
-    hx += dirx;
-    hy += diry;
+    t.pencolor(0, clr/255, 100/255)
+    t.goto(300, -300)
+    t.goto(-300, -300)
+    t.goto(-300, 300)
+    t.goto(300, 300)
+    t.penup()
 
-    if (hx < 0) hx = WIDTH - 1;
-    if (hx >= WIDTH) hx = 0;
-    if (hy < 0) hy = HEIGHT - 1;
-    if (hy >= HEIGHT) hy = 0;
+    
 
-    move_snake();
 
-    if (hx == bx && hy == by) {
-        if (segcount < MAX_SEG)
-            segcount++;
-        spawn_food();
-    }
-}
 
-/* --------- window ---------- */
+def go_right():
+    global facing
+    if facing != "left":
+        facing = "right"
 
-LRESULT CALLBACK WndProc(HWND h, UINT m, WPARAM w, LPARAM l) {
-    if (m == WM_KEYDOWN) {
-        if (w == VK_UP    && diry == 0) { dirx = 0; diry = -1; }
-        if (w == VK_DOWN  && diry == 0) { dirx = 0; diry =  1; }
-        if (w == VK_LEFT  && dirx == 0) { dirx = -1; diry = 0; }
-        if (w == VK_RIGHT && dirx == 0) { dirx =  1; diry = 0; }
-    }
-    if (m == WM_DESTROY) PostQuitMessage(0);
-    return DefWindowProc(h, m, w, l);
-}
+def go_left():
+    global facing
+    if facing != "right":
+        facing = "left"
 
-/* --------- entry ---------- */
+def go_up():
+    global facing
+    if facing != "down":
+        facing = "up"
 
-int WINAPI WinMain(HINSTANCE hi, HINSTANCE hp, LPSTR lp, int sc) {
-    WNDCLASS wc = {0};
-    MSG msg;
+def go_down():
+    global facing
+    if facing != "up":
+        facing = "down"
 
-    srand((unsigned)time(0));
+def touchleft():
+    global facing
+    if facing == "right":
+        facing = "up"
+    elif facing == "up":
+        facing = "left"
+    elif facing == "left":
+        facing = "down"
+    elif facing == "down":
+        facing = "right"
 
-    wc.lpfnWndProc = WndProc;
-    wc.hInstance = hi;
-    wc.lpszClassName = "SnakeWin";
-    RegisterClass(&wc);
+def touchright():
+    global facing
+    if facing == "right":
+        facing = "down"
+    elif facing == "down":
+        facing = "left"
+    elif facing == "left":
+        facing = "up"
+    elif facing == "up":
+        facing = "right"
 
-    hwnd = CreateWindow(
-        "SnakeWin", "Snake",
-        WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT,
-        WIDTH*CELL_SIZE+16, HEIGHT*CELL_SIZE+39,
-        0, 0, hi, 0
-    );
+def click(x, y):
+    global menu
+    if menu == 1:
+        menu = 0
+        mainloop()
+    if menu == 0:
+        if x < 0:
+            touchleft()
+        elif 0 < x:
+            touchright()
 
-    ShowWindow(hwnd, sc);
-    spawn_food();
+def space():
+    global menu
+    if menu == 1:
+        menu = 0
+        mainloop()
+    if menu == 0:
+        pass
+t.onkey(go_up, "Up")
+t.onkey(go_down, "Down")
+t.onkey(go_left, "Left")
+t.onkey(go_right, "Right")
+t.onkey(go_up, "w")
+t.onkey(go_down, "s")
+t.onkey(go_left, "a")
+t.onkey(go_right, "d")
+t.onkey(touchleft, "q")
+t.onkey(touchright, "e")
+t.onkey(space, "space")
+t.onscreenclick(click)
+t.listen()
 
-    while (1) {
-        while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-            if (msg.message == WM_QUIT) return 0;
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
+def mainloop():
+    t.clear()
+    
+    snakemove()
+    snake()
+    berry()
+    gui()
+    
+    t.ontimer(mainloop, 100)
 
-        update();
-        clear_screen();
-        draw_snake();
-        draw_cell(bx, by, RGB(255, 0, 0));
-
-        Sleep(120);
-    }
-}
+t.mainloop()
