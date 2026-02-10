@@ -102,13 +102,13 @@ def snakemove():
 
     if any(px == seg["sx"] and py == seg["sy"] for seg in segments):
         gameover()
-    if (px > 300):
+    if (px > 280):
         px = -300
     if px < -300:
         px = 300
     if py > 300:
         py = -300
-    if py < -300:
+    if py < -280:
         py = 300
 def gameover():
     global px, py, score, segc, segments, startsegcount
