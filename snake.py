@@ -19,6 +19,8 @@ clrm = 1
 calccolour = 0
 berrycolour = 200
 berrycolourm = 1
+valid = 0
+
 
 for _ in range(segc):
     segments.append({
@@ -72,7 +74,7 @@ def snake():
 def snakemove():
     global px, py
     global bx, by
-    global segc, segments, score, highscore
+    global segc, segments, score, highscore, valid
 
     if facing == "up":
         segments.insert(0, {"sx": px, "sy": py})
@@ -88,16 +90,26 @@ def snakemove():
         px += 20
 
     if px == bx and py == by:
-        bx = (random.randint(-10, 10)) * 20
-        score += 1
-        by = (random.randint(-10, 10)) * 20
+        valid = 0
+        while valid == 0:
+            bx = (random.randint(-10, 10)) * 20
+            score += 1
+            by = (random.randint(-10, 10)) * 20
+            if not((bx == px and by == py) or any(bx == _["sx"] and by == _["sy"] for _ in segments)):
+                valid = 1
     else:
         segments.pop()
 
     if any(px == seg["sx"] and py == seg["sy"] for seg in segments):
         gameover()
-    if (px >= 300) or (px <= -300) or (py >= 300) or (py <= -300):
-        gameover()
+    if (px > 300):
+        px = -300
+    if px < -300:
+        px = 300
+    if py > 300:
+        py = -300
+    if py < -300:
+        py = 300
 def gameover():
     global px, py, score, segc, segments, startsegcount
     score = 0
